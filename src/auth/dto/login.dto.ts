@@ -1,4 +1,4 @@
-import { IsEmail, IsString, Length } from 'class-validator';
+import { IsEmail, IsNotEmpty, IsString } from 'class-validator';
 import { Transform } from 'class-transformer';
 
 export class LoginDto {
@@ -8,7 +8,13 @@ export class LoginDto {
   )
   email: string;
 
+  /**
+   * En el login NO se validan longitud ni complejidad a proposito:
+   * esas reglas solo aplican al registro. Aqui cualquier credencial mal
+   * formada debe caer en el mismo mensaje generico del AuthService para
+   * no filtrar la politica de contrasenas ni permitir enumerar usuarios.
+   */
   @IsString({ message: 'password debe ser texto.' })
-  @Length(8, 72, { message: 'password debe tener entre 8 y 72 caracteres.' })
+  @IsNotEmpty({ message: 'password es obligatorio.' })
   password: string;
 }

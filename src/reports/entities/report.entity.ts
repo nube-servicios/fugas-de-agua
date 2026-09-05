@@ -3,6 +3,7 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  Index,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 
@@ -12,6 +13,7 @@ export type Severidad = (typeof SEVERIDADES_PERMITIDAS)[number];
 
 @Entity({ name: 'WATER_REPORT' })
 @Check('CHK_WATER_REPORT_SEVERITY', `"severity" IN ('low', 'medium', 'high')`)
+@Index('IDX_WATER_REPORT_CREATED_AT', ['createdAt'])
 export class Report {
   @PrimaryGeneratedColumn('increment', { name: 'id' })
   id: number;

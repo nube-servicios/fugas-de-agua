@@ -22,7 +22,8 @@ export class ReportsRepository {
       description: dto.description,
       severity: dto.severity,
       reporterPhone: dto.reporterPhone,
-      isResolved: dto.isResolved ?? false,
+      // Todo reporte nace sin atender; solo la cuadrilla puede cambiarlo.
+      isResolved: false,
     });
 
     return this.repositorio.save(reporte);

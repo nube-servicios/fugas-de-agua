@@ -193,6 +193,10 @@ responde `400 Bad Request`:
   `password` está marcada con `select: false`, así que no sale en los `find()`.
 - El `ValidationPipe` global usa `whitelist: true` y `forbidNonWhitelisted: true`:
   cualquier propiedad no declarada en el DTO se rechaza.
+- `POST /reports` no acepta `isResolved`: todo reporte nace sin atender y solo la
+  cuadrilla debería poder cambiar ese estado.
+- El registro traduce la violación de la restricción unique (código `23505`) a
+  `409 Conflict`, así dos peticiones simultáneas con el mismo correo no producen un 500.
 - El mensaje de login es idéntico para correo inexistente y contraseña incorrecta
   (no permite enumerar usuarios).
 - La plantilla del correo escapa `& < > " ' /` en todos los valores dinámicos

@@ -10,6 +10,9 @@ export type UsuarioPublico = Omit<User, 'password'>;
 
 const RONDAS_SALT = 10;
 const MENSAJE_CREDENCIALES = 'Correo electrónico o contraseña inválidos.';
+const MENSAJE_CORREO_DUPLICADO = 'El correo electrónico ya está registrado.';
+/** Codigo de PostgreSQL para violacion de restriccion unique. */
+const CODIGO_UNIQUE_VIOLATION = '23505';
 
 @Injectable()
 export class AuthService {
@@ -20,19 +23,30 @@ export class AuthService {
     const existente = await this.usersRepository.buscarPorCorreo(dto.email);
 
     if (existente) {
-      throw new ConflictException('El correo electrónico ya está registrado.');
+      throw new ConflictException(MENSAJE_CORREO_DUPLICADO);
     }
 
     const passwordHash = await bcrypt.hash(dto.password, RONDAS_SALT);
 
-    const usuario = await this.usersRepository.crear({
-      name: dto.name,
-      email: dto.email,
-      passwordHash,
-      isNotificationEnabled: dto.isNotificationEnabled,
-    });
+    try {
+      const usuario = await this.usersRepository.crear({
+        name: dto.name,
+        email: dto.email,
+        passwordHash,
+        isNotificationEnabled: dto.isNotificationEnabled,
+      });
 
-    return this.sinPassword(usuario);
+      return this.sinPassword(usuario);
+    } catch (error) {
+      // Dos peticiones simultaneas pueden pasar la consulta previa y chocar
+      // en el INSERT. La restriccion unique de la BD es la fuente de verdad.
+      if ((error as { driverError?: { code?: string }; code?: string })?.driverError?.code === CODIGO_UNIQUE_VIOLATION ||
+        (error as { code?: string })?.code === CODIGO_UNIQUE_VIOLATION) {
+        throw new ConflictException(MENSAJE_CORREO_DUPLICADO);
+      }
+
+      throw error;
+    }
   }
 
   /** Valida credenciales. Nunca revela si fallo el correo o la contrasena. */

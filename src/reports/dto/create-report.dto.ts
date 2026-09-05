@@ -1,6 +1,12 @@
-import { IsBoolean, IsIn, IsOptional, IsString, Length, Matches } from 'class-validator';
+import { IsIn, IsString, Length, Matches } from 'class-validator';
 import { SEVERIDADES_PERMITIDAS, Severidad } from '../entities/report.entity';
 
+/**
+ * Datos que envia el ciudadano al reportar una fuga.
+ * isResolved NO se incluye a proposito: marcar un reporte como atendido es
+ * una accion de la cuadrilla, no del ciudadano. Con forbidNonWhitelisted
+ * activo, mandarlo en el body devuelve 400.
+ */
 export class CreateReportDto {
   @IsString({ message: 'address debe ser texto.' })
   @Length(5, 255, { message: 'address debe tener entre 5 y 255 caracteres.' })
@@ -21,8 +27,4 @@ export class CreateReportDto {
     message: 'reporterPhone solo admite numeros y los signos + - ( ) y espacios.',
   })
   reporterPhone: string;
-
-  @IsOptional()
-  @IsBoolean({ message: 'isResolved debe ser booleano.' })
-  isResolved?: boolean;
 }
