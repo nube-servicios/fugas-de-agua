@@ -1,0 +1,37 @@
+import { Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { Report } from './entities/report.entity';
+import { CreateReportDto } from './dto/create-report.dto';
+
+/**
+ * Capa de acceso a datos de los reportes.
+ * Es la unica que conoce TypeORM; el service nunca habla directo con la BD.
+ */
+@Injectable()
+export class ReportsRepository {
+  constructor(
+    @InjectRepository(Report)
+    private readonly repositorio: Repository<Report>,
+  ) {}
+
+  /** Inserta un nuevo reporte y devuelve la fila creada. */
+  async crear(dto: CreateReportDto): Promise<Report> {
+    const reporte = this.repositorio.create({
+      address: dto.address,
+      description: dto.description,
+      severity: dto.severity,
+      reporterPhone: dto.reporterPhone,
+      isResolved: dto.isResolved ?? false,
+    });
+
+    return this.repositorio.save(reporte);
+  }
+
+  /** Devuelve todos los reportes del mas reciente al mas antiguo. */
+  async obtenerTodos(): Promise<Report[]> {
+    return this.repositorio.find({
+      order: { createdAt: 'DESC', id: 'DESC' },
+    });
+  }
+}
