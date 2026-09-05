@@ -1,0 +1,22 @@
+meta {
+  name: 04 - Login
+  type: http
+  seq: 4
+}
+
+post {
+  url: {{baseUrl}}/auth/login
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "email": "dgaeltfp005@gmail.com",
+    "password": "Municipio2026"
+  }
+}

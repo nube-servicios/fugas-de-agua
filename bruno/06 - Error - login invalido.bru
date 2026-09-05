@@ -1,0 +1,22 @@
+meta {
+  name: 06 - Error - login invalido
+  type: http
+  seq: 6
+}
+
+post {
+  url: {{baseUrl}}/auth/login
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "email": "dgaeltfp005@gmail.com",
+    "password": "ContrasenaIncorrecta1"
+  }
+}

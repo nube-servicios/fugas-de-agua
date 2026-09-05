@@ -1,0 +1,23 @@
+meta {
+  name: 03 - Registrar usuario
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{baseUrl}}/auth/register
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "name": "Diego Gael Tierra",
+    "email": "dgaeltfp005@gmail.com",
+    "password": "Municipio2026"
+  }
+}
