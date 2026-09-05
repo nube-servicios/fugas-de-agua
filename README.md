@@ -64,7 +64,7 @@ cp .env.example .env   # y edita los valores
 | `MAIL_PORT` | Puerto SMTP | `587` |
 | `MAIL_SECURE` | TLS directo (`true` para el puerto 465) | `false` |
 | `MAIL_USER` | Usuario SMTP | `usuario@example.com` |
-| `MAIL_PASSWORD` | Contraseña o app password | `xxxx xxxx xxxx xxxx` |
+| `MAIL_PASSWORD` | Contraseña de aplicación de Gmail (no la del correo) | `xxxx xxxx xxxx xxxx` |
 | `MAIL_FROM` | Remitente mostrado | `Municipio <no-reply@example.com>` |
 | `MAINTENANCE_EMAIL` | Correo de la cuadrilla que recibe los reportes | `cuadrilla@example.com` |
 
@@ -73,10 +73,15 @@ Si falta alguna, la aplicación falla al arrancar con un mensaje claro.
 
 ## Base de datos
 
-Si no tienes PostgreSQL local, puedes levantarlo con Docker:
+Instalación de PostgreSQL en macOS con Homebrew:
 
 ```bash
-docker compose up -d
+brew install postgresql@16
+brew services start postgresql@16
+export PATH="/opt/homebrew/opt/postgresql@16/bin:$PATH"
+createuser -s postgres
+psql -d postgres -c "ALTER USER postgres WITH PASSWORD 'postgres';"
+createdb -O postgres api_agua
 ```
 
 Ejecutar las migraciones (crea `SYSTEM_USER` y `WATER_REPORT`):
