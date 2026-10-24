@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AguaFix - Reportes de fugas</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <header class="encabezado">
+      <div class="contenedor">
+        <h1>AguaFix</h1>
+        <p>Reporta fugas de agua en la vía pública de tu municipio.</p>
+      </div>
+    </header>
+
+    <main class="contenedor rejilla">
+      <section class="tarjeta" aria-labelledby="titulo-form">
+        <h2 id="titulo-form">Nuevo reporte</h2>
+
+        <form id="formulario" novalidate>
+          <label for="address">Dirección</label>
+          <input id="address" name="address" type="text" required minlength="5" maxlength="255"
+                 placeholder="Calle, número, colonia y referencias" autocomplete="street-address" />
+
+          <label for="description">Descripción</label>
+          <textarea id="description" name="description" required minlength="10" maxlength="500" rows="4"
+                    placeholder="¿Qué ves? ¿Desde cuándo? ¿Cuánta agua sale?"></textarea>
+
+          <label for="severity">Severidad</label>
+          <select id="severity" name="severity" required>
+            <option value="">Selecciona…</option>
+            <option value="low">Baja</option>
+            <option value="medium">Media</option>
+            <option value="high">Alta</option>
+          </select>
+
+          <label for="reporterPhone">Teléfono de contacto</label>
+          <input id="reporterPhone" name="reporterPhone" type="tel" required minlength="7" maxlength="20"
+                 pattern="[0-9+\-\s()]+" placeholder="477 123 4567" autocomplete="tel" />
+
+          <label for="photo">Fotografía de la fuga</label>
+          <input id="photo" name="photo" type="file" required accept="image/jpeg,image/png,image/webp" />
+          <p class="ayuda">JPG, PNG o WEBP. Máximo <span id="limite-mb">5</span> MB.</p>
+
+          <figure id="vista-previa" class="vista-previa" hidden>
+            <img id="imagen-previa" alt="Vista previa de la fotografía seleccionada" />
+          </figure>
+
+          <button id="boton-enviar" type="submit">Enviar reporte</button>
+          <p id="estado" class="estado" role="status" aria-live="polite"></p>
+        </form>
+      </section>
+
+      <section class="tarjeta" aria-labelledby="titulo-lista">
+        <div class="fila-titulo">
+          <h2 id="titulo-lista">Reportes recientes</h2>
+          <button id="boton-recargar" type="button" class="secundario">Actualizar</button>
+        </div>
+        <p id="estado-lista" class="estado" role="status" aria-live="polite"></p>
+        <ul id="lista" class="lista"></ul>
+      </section>
+    </main>
+
+    <script src="app.js"></script>
+  </body>
+</html>

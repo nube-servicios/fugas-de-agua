@@ -29,10 +29,43 @@ export function escaparHtml(valor: unknown): string {
 }
 
 /**
+ * Prepara una URL para un atributo src/href: solo acepta http(s) y escapa
+ * los caracteres que podrian cerrar el atributo. Cualquier otra cosa -> ''.
+ */
+export function escaparUrl(url: unknown): string {
+  const texto = String(url ?? '').trim();
+  if (!/^https?:\/\//i.test(texto)) return '';
+
+  return texto
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+/** Bloque HTML con la fotografia de la fuga (o un aviso si no hay URL valida). */
+function bloqueFotografia(photoUrl: string): string {
+  const url = escaparUrl(photoUrl);
+
+  if (!url) {
+    return `<p style="margin:20px 0 0;font-size:13px;color:#616161;">El reporte no incluye fotografia.</p>`;
+  }
+
+  return `<p style="margin:20px 0 8px;font-size:14px;font-weight:bold;">Fotografia de la fuga</p>
+          <a href="${url}" target="_blank" rel="noopener noreferrer" style="text-decoration:none;">
+            <img src="${url}" alt="Fotografia de la fuga reportada" width="572" style="display:block;width:100%;max-width:572px;height:auto;border:1px solid #e0e0e0;border-radius:6px;" />
+          </a>
+          <p style="margin:8px 0 0;font-size:12px;color:#616161;">
+            Si la imagen no se muestra, <a href="${url}" target="_blank" rel="noopener noreferrer" style="color:#0d47a1;">abrela aqui</a>.
+          </p>`;
+}
+
+/**
  * Genera el HTML del correo que recibe la cuadrilla de mantenimiento.
  * Todos los valores dinamicos se escapan antes de interpolarse.
  */
-export function generateReportTemplate(dto: CreateReportDto): string {
+export function generateReportTemplate(dto: CreateReportDto, photoUrl: string): string {
   const direccion = escaparHtml(dto.address);
   const descripcion = escaparHtml(dto.description);
   const telefono = escaparHtml(dto.reporterPhone);
@@ -89,6 +122,8 @@ export function generateReportTemplate(dto: CreateReportDto): string {
               <td style="padding:10px 12px;border:1px solid #e0e0e0;">${telefono}</td>
             </tr>
           </table>
+
+          ${bloqueFotografia(photoUrl)}
 
           <p style="margin:20px 0 0;font-size:13px;line-height:1.5;color:#616161;">
             Favor de programar la inspeccion correspondiente y actualizar el estado del

@@ -1,0 +1,179 @@
+{
+  "info": {
+    "name": "AguaFix API - Reportes con fotografía",
+    "description": "Colección de la entrega: reportes de fugas con foto en S3. En los POST con foto, abre Body > form-data y selecciona tu imagen en el campo 'photo' (JPG, PNG o WEBP, máx. 5 MB).",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:3000" },
+    { "key": "email", "value": "ciudadano.demo@example.com" }
+  ],
+  "item": [
+    {
+      "name": "Reportes",
+      "item": [
+        {
+          "name": "POST /reports con foto (201)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('201 Created', () => pm.response.to.have.status(201));",
+                  "const r = pm.response.json();",
+                  "pm.test('photoUrl apunta a reports/ en S3', () => pm.expect(r.photoUrl).to.match(/\\/reports\\/[0-9a-f-]{36}\\.(jpg|png|webp)$/));",
+                  "pm.test('repairPhotoUrl es null', () => pm.expect(r.repairPhotoUrl).to.equal(null));",
+                  "pm.test('isResolved inicia en false', () => pm.expect(r.isResolved).to.equal(false));",
+                  "pm.collectionVariables.set('ultimaFoto', r.photoUrl);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/reports",
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                { "key": "address", "value": "Blvd. Adolfo López Mateos 1500, León, Gto.", "type": "text" },
+                { "key": "description", "value": "Fuga constante en la banqueta, el agua llega hasta la esquina.", "type": "text" },
+                { "key": "severity", "value": "high", "type": "text", "description": "low | medium | high" },
+                { "key": "reporterPhone", "value": "477 123 4567", "type": "text" },
+                { "key": "photo", "type": "file", "src": [], "description": "Selecciona la foto de la fuga" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "POST /reports sin foto (400)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('400 Bad Request', () => pm.response.to.have.status(400));",
+                  "pm.test('Mensaje de foto obligatoria', () => pm.expect(pm.response.json().message).to.include('photo'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/reports",
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                { "key": "address", "value": "Blvd. Adolfo López Mateos 1500, León, Gto.", "type": "text" },
+                { "key": "description", "value": "Fuga constante en la banqueta, el agua llega hasta la esquina.", "type": "text" },
+                { "key": "severity", "value": "high", "type": "text" },
+                { "key": "reporterPhone", "value": "4771234567", "type": "text" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "POST /reports con campos internos (400)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": ["pm.test('400 Bad Request', () => pm.response.to.have.status(400));"]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/reports",
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                { "key": "address", "value": "Blvd. Adolfo López Mateos 1500, León, Gto.", "type": "text" },
+                { "key": "description", "value": "Intento de marcar el reporte como resuelto.", "type": "text" },
+                { "key": "severity", "value": "low", "type": "text" },
+                { "key": "reporterPhone", "value": "4771234567", "type": "text" },
+                { "key": "isResolved", "value": "true", "type": "text" },
+                { "key": "photoUrl", "value": "https://otro-sitio.example/foto.jpg", "type": "text" },
+                { "key": "photo", "type": "file", "src": [], "description": "Selecciona cualquier foto válida" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "POST /reports archivo no imagen (400)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": ["pm.test('400 Bad Request', () => pm.response.to.have.status(400));"]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/reports",
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                { "key": "address", "value": "Blvd. Adolfo López Mateos 1500, León, Gto.", "type": "text" },
+                { "key": "description", "value": "Prueba con un archivo que no es imagen.", "type": "text" },
+                { "key": "severity", "value": "medium", "type": "text" },
+                { "key": "reporterPhone", "value": "4771234567", "type": "text" },
+                { "key": "photo", "type": "file", "src": [], "description": "Selecciona un .txt o .pdf" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "GET /reports (200)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200 OK', () => pm.response.to.have.status(200));",
+                  "const lista = pm.response.json();",
+                  "pm.test('Cada reporte trae photoUrl y repairPhotoUrl', () => lista.forEach(r => { pm.expect(r).to.have.property('photoUrl'); pm.expect(r).to.have.property('repairPhotoUrl'); }));"
+                ]
+              }
+            }
+          ],
+          "request": { "method": "GET", "url": "{{baseUrl}}/reports" }
+        }
+      ]
+    },
+    {
+      "name": "Auth (primer parcial)",
+      "item": [
+        {
+          "name": "POST /auth/register",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/auth/register",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Ciudadano Demo\",\n  \"email\": \"{{email}}\",\n  \"password\": \"Municipio2026\"\n}"
+            }
+          }
+        },
+        {
+          "name": "POST /auth/login",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/auth/login",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{email}}\",\n  \"password\": \"Municipio2026\"\n}"
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

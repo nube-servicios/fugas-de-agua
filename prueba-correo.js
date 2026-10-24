@@ -32,7 +32,8 @@ const { generateReportTemplate } = require('./dist/reports/templates/report.temp
     from: process.env.MAIL_FROM,
     to: process.env.MAINTENANCE_EMAIL,
     subject: 'Prueba - Nuevo reporte de fuga de agua #1 - severidad high',
-    html: generateReportTemplate(dto),
+    // Uso: TEST_PHOTO_URL=https://... node prueba-correo.js (sin URL el correo avisa que no hay foto)
+    html: generateReportTemplate(dto, process.env.TEST_PHOTO_URL || ''),
   });
 
   console.log('ENVIO: OK ->', info.response);

@@ -1,0 +1,33 @@
+# Secretos y configuracion local: nunca dentro de la imagen
+.env
+.env.*
+*.env
+compose.yaml
+compose.*.yaml
+docker-compose*.yml
+docker-compose*.yaml
+.aws
+credentials
+*.pem
+*.key
+*.p12
+*.crt
+
+# Se generan dentro del build
+node_modules
+dist
+*.tsbuildinfo
+
+# Control de versiones, CI y archivos que no necesita la API
+.git
+.github
+.gitignore
+.dockerignore
+test
+postman
+prueba-correo.js
+*.log
+.DS_Store
+.vscode
+.idea
+README.md

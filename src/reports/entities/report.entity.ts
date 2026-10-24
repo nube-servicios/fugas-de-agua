@@ -38,6 +38,14 @@ export class Report {
   @Column({ name: 'isResolved', type: 'boolean', default: false })
   isResolved: boolean;
 
+  /** URL publica de la foto de la fuga en S3. NULL en reportes anteriores a las fotos. */
+  @Column({ name: 'photoUrl', type: 'varchar', length: 1024, nullable: true })
+  photoUrl: string | null;
+
+  /** URL de la foto de la reparacion. Opcional; aun no hay flujo que la asigne. */
+  @Column({ name: 'repairPhotoUrl', type: 'varchar', length: 1024, nullable: true })
+  repairPhotoUrl: string | null;
+
   /** Fecha de creacion asignada automaticamente por la base de datos. */
   @CreateDateColumn({
     name: 'createdAt',

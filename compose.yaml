@@ -1,0 +1,37 @@
+# API + PostgreSQL usando la imagen publicada en Docker Hub.
+# Uso:  docker compose pull && docker compose up -d
+# Lee las variables de .env (no se copia a la imagen; ver .dockerignore).
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${DB_USERNAME}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
+    volumes:
+      - pgdata:/var/lib/postgresql/data # persistencia entre reinicios
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+    # Sin "ports": la BD solo es accesible desde la red interna de compose.
+
+  api:
+    image: ${DOCKER_USER:?Define DOCKER_USER (tu usuario de Docker Hub) en .env}/aguafix-api:latest
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      PORT: "3000"
+      DB_HOST: db # nombre del servicio = host dentro de la red de compose
+      DB_PORT: "5432"
+      DB_RUN_MIGRATIONS: "true" # aplica migraciones pendientes al arrancar
+    ports:
+      - "${API_PORT:-3000}:3000"
+    depends_on:
+      db:
+        condition: service_healthy # espera a que PostgreSQL acepte conexiones
+
+volumes:
+  pgdata:

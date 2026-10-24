@@ -5,10 +5,14 @@
 /dist
 *.tsbuildinfo
 
-# Variables de entorno
+# Variables de entorno y secretos (solo se versiona la plantilla)
 .env
-.env.local
-.env.*.local
+.env.*
+*.env
+!.env.example
+.aws/
+*.pem
+*.key
 
 # Logs
 *.log

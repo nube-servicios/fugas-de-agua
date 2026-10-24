@@ -17,6 +17,8 @@ export const opcionesBaseDeDatos: DataSourceOptions = {
   entities: [Report, User],
   migrations: [__dirname + '/migrations/*{.ts,.js}'],
   migrationsTableName: 'migrations_history',
+  // En Docker se activa con DB_RUN_MIGRATIONS=true para no depender de ts-node.
+  migrationsRun: envs.baseDeDatos.ejecutarMigraciones,
   synchronize: false,
   logging: ['error', 'warn', 'migration'],
 };
